@@ -27,11 +27,15 @@ migrate_working_dir/
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
+.packages
 .pub-cache/
 .pub/
 /build/
-/coverage/
+
+# Coverage
+coverage/
 
 # Symbolication related
 app.*.symbols
@@ -43,3 +47,50 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# iOS/macOS
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/Flutter.framework
+**/ios/Flutter/Flutter.podspec
+**/ios/ServiceDefinitions.json
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/macos/Pods/
+**/macos/.symlinks/
+**/macos/Flutter/ephemeral/
+**/macos/Flutter/Flutter-Debug.xcconfig
+**/macos/Flutter/Flutter-Release.xcconfig
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+
+# Exceptions to above rules
+!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
+# Node modules (if using web)
+node_modules/
+
+# Firebase
+**/android/app/google-services.json
+**/ios/Runner/GoogleService-Info.plist
+**/ios/firebase_app_id_file.json
+**/macos/Runner/GoogleService-Info.plist
+**/macos/firebase_app_id_file.json
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Generated files
+*.g.dart
+*.freezed.dart
+*.mocks.dart
+
+# FVM Version Cache
+.fvm/
+
+# Analysis options cache
+.flutter_tool_fuchsia_test_output
+
+# Podfile.lock
+ios/Podfile.lock
+macos/Podfile.lock

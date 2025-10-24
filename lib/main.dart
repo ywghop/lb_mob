@@ -4,10 +4,19 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  await Supabase.initialize(
-    url: 'https://pqgdzihnjaogyepbxiti.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxZ2R6aWhuamFvZ3llcGJ4aXRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMzIyMTAsImV4cCI6MjA3NjkwODIxMH0.hNDGITVAyWk25jdPzg9xYYi_-ZMytJetGvg4VPrqDRY',
-  );
+  try {
+    await Supabase.initialize(
+      url: 'https://pqgdzihnjaogyepbxiti.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBxZ2R6aWhuamFvZ3llcGJ4aXRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEzMzIyMTAsImV4cCI6MjA3NjkwODIxMH0.hNDGITVAyWk25jdPzg9xYYi_-ZMytJetGvg4VPrqDRY',
+      debug: true,
+      realtimeClientOptions: const RealtimeClientOptions(
+        eventsPerSecond: 2,
+      ),
+    );
+    print('Supabase инициализирован успешно');
+  } catch (e) {
+    print('Ошибка инициализации Supabase: $e');
+  }
   
   runApp(const MyApp());
 }
@@ -43,6 +52,12 @@ class _ProfilesPageState extends State<ProfilesPage> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    _loadProfiles();
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
@@ -62,48 +77,71 @@ class _ProfilesPageState extends State<ProfilesPage> {
     });
 
     try {
-      await supabase.from('profiles').insert({
+      print('Попытка добавить профиль: ${_nameController.text}, ${_emailController.text}');
+      
+      final response = await supabase.from('profiles').insert({
         'name': _nameController.text,
         'email': _emailController.text,
-      });
+      }).select();
+
+      print('Ответ от Supabase: $response');
 
       _nameController.clear();
       _emailController.clear();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Профиль добавлен успешно')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Профиль добавлен успешно')),
+        );
+      }
 
-      _loadProfiles();
+      await _loadProfiles();
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка: $error')),
-      );
+      print('Ошибка добавления профиля: $error');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка: $error')),
+        );
+      }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   Future<void> _loadProfiles() async {
-    setState(() {
-      _isLoading = true;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+    }
 
     try {
+      print('Попытка загрузить профили...');
       final data = await supabase.from('profiles').select();
-      setState(() {
-        _profiles = List<Map<String, dynamic>>.from(data);
-      });
+      print('Загружено профилей: ${data.length}');
+      
+      if (mounted) {
+        setState(() {
+          _profiles = List<Map<String, dynamic>>.from(data);
+        });
+      }
     } catch (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ошибка загрузки: $error')),
-      );
+      print('Ошибка загрузки профилей: $error');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка загрузки: $error')),
+        );
+      }
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
